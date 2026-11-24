@@ -1,0 +1,41 @@
+[server]
+bind = "127.0.0.1:8080"
+db_path = "./ai-proxy.db"
+# Optional bearer token protecting all routes except /health (or set API_TOKEN / AI_PROXY_API_TOKEN)
+# api_token = "change-me"
+default_provider = "gemini"
+
+[routing.model_map]
+"gpt-4o" = "openai"
+"gpt-4o-mini" = "openai"
+
+[providers.gemini]
+preset = "gemini"
+base_url = "https://generativelanguage.googleapis.com"
+openai_compat_path = "/v1beta/openai"
+strategy = "sticky" # "sticky" | "round_robin"
+retry_on_503 = false
+fallback_cooldown_secs = 60
+backoff_multiplier = 2.0
+max_backoff_secs = 3600
+# Keys can also be supplied via GEMINI_API_KEYS (CSV or JSON array) or GEMINI_API_KEY_1..N
+keys = []
+
+[providers.openai]
+preset = "openai_compat"
+base_url = "https://api.openai.com"
+openai_compat_path = "/v1"
+auth = "bearer" # "bearer" | "header:<name>" | "query:<name>"
+strategy = "sticky"
+retry_on_503 = false
+fallback_cooldown_secs = 60
+backoff_multiplier = 2.0
+max_backoff_secs = 3600
+keys = []
+
+[providers.anthropic]
+preset = "openai_compat"
+base_url = "https://api.anthropic.com"
+auth = "header:x-api-key"
+strategy = "sticky"
+keys = []
